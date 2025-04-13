@@ -1,32 +1,79 @@
 
-# 🔧 Temperature-Based Predictive Maintenance Project
+# 🔧 Temperature-Based Predictive Maintenance (PdM)
 
-This project implements a machine learning pipeline to detect machine failures based on temperature and other sensor data.
+A machine learning project to predict machine failure based on temperature and sensor data.
 
-## 📁 Files Included
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Status](https://img.shields.io/badge/Status-Completed-green)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-- `temperature_pdm_notebook.ipynb`: Complete code for data analysis, training, and evaluation
-- `README.md`: Project documentation and instructions
+---
+
+## 📌 Problem Statement
+
+Unplanned machine failures cause downtime and cost. This project uses **temperature data** and other sensor metrics to predict equipment failure using machine learning.
+
+---
 
 ## 🛠️ Tech Stack
 
 - Python
+- Scikit-learn
+- Pandas, Matplotlib, Seaborn
 - Google Colab / Jupyter
-- scikit-learn
-- pandas, matplotlib, seaborn
 
-## 🚀 Steps
+---
 
-1. Upload the dataset in Colab
-2. Follow the notebook to preprocess, train, and evaluate
-3. Analyze feature importance and draw conclusions
+## 📁 Files
+
+- `temperature_pdm_notebook.ipynb` – Full end-to-end code
+- `README.md` – Project overview
+
+---
+
+## 🚀 How to Run
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/akashshahade/temperature-predictive-maintenance.git
+   ```
+2. Open the notebook in Colab or Jupyter.
+3. Upload the dataset from [Kaggle](https://www.kaggle.com/datasets/shivamb/machine-predictive-maintenance-classification).
+4. Follow the notebook for EDA → Preprocessing → Training → Evaluation.
+
+---
 
 ## 📊 Output
 
-- Confusion matrix
-- Classification report
-- Feature importance plot
+- Confusion Matrix
+- Classification Report
+- Feature Importance Graph
 
-## ✅ Conclusion
+---
 
-Temperature is a key predictor for identifying potential machine failures. This project shows how predictive maintenance can reduce unplanned downtime using machine learning models.
+## ✅ Results & Conclusion
+
+- High accuracy in predicting failure types
+- Temperature & tool wear found to be key indicators
+- Helps in scheduling proactive maintenance
+
+---
+
+## 💡 Future Scope
+
+- Integrate real-time IoT sensor streaming
+- Apply deep learning for time-series forecasting
+- Deploy as a dashboard for industrial monitoring
+
+---
+
+## ✍️ Developed By
+
+**Akash Shahade**  
+🔗 [github.com/akashshahade](https://github.com/akashshahade)
+
+---
+
+## 📜 License
+
+This project is under [MIT License](LICENSE).
