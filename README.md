@@ -73,6 +73,10 @@ Unplanned machine failures cause downtime and cost. This project uses **temperat
 🔗 [github.com/akashshahade](https://github.com/akashshahade)
 
 ---
+![output](https://github.com/user-attachments/assets/cb676fcf-97e9-4c99-bf4a-fd5f8ee249ac)
+
+
+
 
 ## 📜 License
 
