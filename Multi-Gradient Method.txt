@@ -1,0 +1,137 @@
+### **Summary of the Multi-Gradient Method**
+
+The **Multi-Gradient Method** for temperature monitoring uses **four different gradients** calculated over different time intervals: **1 minute, 1 hour, 1 day, and 1 week**. This method provides a comprehensive understanding of the system's behavior, helping to detect anomalies in both short-term fluctuations and long-term trends.
+
+### **Step-by-Step Method**
+
+1. **Collect Temperature Data:**
+
+   * Collect the temperature readings from the system at regular intervals (e.g., every minute).
+
+2. **Calculate Gradients:**
+
+   * **1-Minute Gradient (G1):** Measures short-term temperature changes.
+
+     $$
+     G1 = \frac{T_{current} - T_{previous}}{\Delta t}
+     $$
+   * **1-Hour Gradient (G2):** Measures medium-term temperature trends.
+
+     $$
+     G2 = \frac{T_{current} - T_{previous}}{60 \text{ mins}}
+     $$
+   * **1-Day Gradient (G3):** Measures longer-term temperature behavior over 24 hours.
+
+     $$
+     G3 = \frac{T_{current} - T_{previous}}{1440 \text{ mins}}
+     $$
+   * **1-Week Gradient (G4):** Tracks temperature trends over a week (7 days).
+
+     $$
+     G4 = \frac{T_{current} - T_{previous}}{10080 \text{ mins}}
+     $$
+
+3. **Set Thresholds for Each Gradient:**
+   Define threshold levels for each gradient, which determine the severity of the alarm:
+
+   | **Gradient Type** | **Normal**   | **Warning**    | **Critical** |
+   | ----------------- | ------------ | -------------- | ------------ |
+   | **1-Minute (G1)** | ≤ 0.5°C/min  | 0.5–1.0°C/min  | > 1.0°C/min  |
+   | **1-Hour (G2)**   | ≤ 0.2°C/min  | 0.2–0.5°C/min  | > 0.5°C/min  |
+   | **1-Day (G3)**    | ≤ 0.1°C/min  | 0.1–0.2°C/min  | > 0.2°C/min  |
+   | **1-Week (G4)**   | ≤ 0.05°C/min | 0.05–0.1°C/min | > 0.1°C/min  |
+
+4. **Monitor Gradients Continuously:**
+
+   * Calculate the gradients at each time interval (1 minute, 1 hour, 1 day, 1 week).
+   * Compare the calculated gradients against the threshold values.
+
+5. **Determine Alarm Level:**
+   Based on the thresholds, determine the alarm level:
+
+   * **Normal:** All gradients are within normal limits.
+   * **Warning:** If any gradient is in the warning range.
+   * **Critical:** If any gradient exceeds the critical threshold.
+
+6. **Take Corrective Actions:**
+
+   * If in **Warning** or **Critical**, further investigation or corrective action is required (e.g., reduce load, check ventilation, etc.).
+
+---
+
+### **Flowchart:**
+
+```plaintext
+Start
+  |
+  |---> Collect Temperature Data at Regular Intervals
+  |
+  |---> Calculate Gradients (G1, G2, G3, G4)
+  |
+  |---> Compare Gradients with Thresholds
+  |
+  |---> Determine Alarm Level:
+  |       |
+  |       |---> Normal: All gradients below warning threshold
+  |       |
+  |       |---> Warning: Any gradient in warning range
+  |       |
+  |       |---> Critical: Any gradient in critical range
+  |
+  |---> Trigger Alarm or Take Action
+  |
+  End
+```
+
+---
+
+### **Final Algorithm Example**
+
+```python
+# Gradient Calculation Function
+def calculate_gradient(T_current, T_previous, delta_t):
+    return (T_current - T_previous) / delta_t
+
+# Define Thresholds for Normal, Warning, and Critical Levels
+thresholds = {
+    "G1": {"Normal": 0.5, "Warning": 1.0, "Critical": 1.5},  # 1-min gradient
+    "G2": {"Normal": 0.2, "Warning": 0.5, "Critical": 1.0},  # 1-hour gradient
+    "G3": {"Normal": 0.1, "Warning": 0.2, "Critical": 0.5},  # 1-day gradient
+    "G4": {"Normal": 0.05, "Warning": 0.1, "Critical": 0.2},  # 1-week gradient
+}
+
+# Example Data (Current, Previous Temperatures)
+T_current = 85
+T_previous = 80
+delta_t = 1  # 1 minute for G1, 60 minutes for G2, 1440 minutes for G3, 10080 minutes for G4
+
+# Calculate Gradients
+gradients = {
+    "G1": calculate_gradient(T_current, T_previous, delta_t),
+    "G2": calculate_gradient(T_current, T_previous, 60),  # for 1 hour
+    "G3": calculate_gradient(T_current, T_previous, 1440),  # for 1 day
+    "G4": calculate_gradient(T_current, T_previous, 10080),  # for 1 week
+}
+
+# Determine Alarm Level
+def determine_alarm_level(gradients):
+    alarm_levels = {}
+    for gradient_type, gradient in gradients.items():
+        if gradient > thresholds[gradient_type]["Critical"]:
+            alarm_levels[gradient_type] = "Critical"
+        elif gradient > thresholds[gradient_type]["Warning"]:
+            alarm_levels[gradient_type] = "Warning"
+        else:
+            alarm_levels[gradient_type] = "Normal"
+    return alarm_levels
+
+# Output Alarm Levels
+alarm_levels = determine_alarm_level(gradients)
+print("Alarm Levels:", alarm_levels)
+```
+
+---
+
+### **Conclusion**
+
+The **Multi-Gradient Method** provides a thorough and layered approach to temperature monitoring across multiple time intervals, ensuring you can detect both **immediate fluctuations** and **long-term trends** in temperature. This method helps in identifying potential issues early on and allows for effective corrective actions to maintain system integrity.
