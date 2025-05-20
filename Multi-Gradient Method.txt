@@ -132,6 +132,206 @@ print("Alarm Levels:", alarm_levels)
 
 ---
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+Certainly! Below is the **final documentation** of the **combined gradient-based alarm system** and **linear algebraic system state analysis**. This document provides a clear, easy-to-understand explanation of how the two techniques work together for a comprehensive monitoring system.
+
+---
+
+## **Combined Gradient-Based Alarm System & Linear Algebraic System State Analysis**
+
+### **Overview**
+
+The **Multi-Gradient Alarm System** and **Linear Algebraic System State Analysis** are combined to create a powerful temperature monitoring system for medium-voltage switchgear. This system works in **two parallel layers**:
+
+1. **Gradient-Based Alarm System**: Monitors short-term and long-term temperature fluctuations.
+2. **Linear Algebraic System State Analysis**: Provides an aggregated view of the system's stability based on the differences between gradients and threshold values, calculated using matrix determinants.
+
+### **1. Gradient-Based Alarm System**
+
+This system calculates the **gradient** of temperature over multiple time intervals to determine the **alarm state** of the system (Normal, Warning, Critical). The gradients are calculated for:
+
+* **1-Minute Gradient (G1)**
+* **1-Hour Gradient (G2)**
+* **1-Day Gradient (G3)**
+* **1-Week Gradient (G4)**
+
+#### **Gradient Calculation**
+
+For each time interval, the gradient is calculated using the formula:
+
+$$
+G = \frac{T_{\text{current}} - T_{\text{previous}}}{\Delta t}
+$$
+
+Where:
+
+* $T_{\text{current}}$ is the current temperature.
+* $T_{\text{previous}}$ is the previous temperature.
+* $\Delta t$ is the time difference between the readings (in minutes, hours, etc.).
+
+#### **Thresholds for Alarm Levels**
+
+Each gradient is compared against the following **thresholds** to determine the alarm state:
+
+| **Gradient Type** | **Normal**   | **Warning**    | **Critical** |
+| ----------------- | ------------ | -------------- | ------------ |
+| **1-Minute (G1)** | ≤ 0.5°C/min  | 0.5–1.0°C/min  | > 1.0°C/min  |
+| **1-Hour (G2)**   | ≤ 0.2°C/min  | 0.2–0.5°C/min  | > 0.5°C/min  |
+| **1-Day (G3)**    | ≤ 0.1°C/min  | 0.1–0.2°C/min  | > 0.2°C/min  |
+| **1-Week (G4)**   | ≤ 0.05°C/min | 0.05–0.1°C/min | > 0.1°C/min  |
+
+#### **Alarm State Determination**
+
+* **Normal**: If the gradient is below the warning threshold.
+* **Warning**: If the gradient falls within the warning range.
+* **Critical**: If the gradient exceeds the critical threshold.
+
+---
+
+### **2. Linear Algebraic System State Analysis**
+
+In parallel with the gradient-based alarm system, the **system state** is analyzed using **linear algebra**. The system’s stability is assessed based on the differences between the gradients and their corresponding thresholds. This method uses the **determinant** of a **difference matrix** to determine whether the system is **stable**, **unstable**, or in **critical alarm mode**.
+
+#### **Matrix Construction**
+
+The gradients and their thresholds are used to construct a **4x4 matrix**:
+
+$$
+\mathbf{G} = \begin{bmatrix} G1 \\ G2 \\ G3 \\ G4 \end{bmatrix}, \quad
+\mathbf{T} = \begin{bmatrix}
+    T1_{\text{normal}} & T1_{\text{warning}} & T1_{\text{critical}} \\
+    T2_{\text{normal}} & T2_{\text{warning}} & T2_{\text{critical}} \\
+    T3_{\text{normal}} & T3_{\text{warning}} & T3_{\text{critical}} \\
+    T4_{\text{normal}} & T4_{\text{warning}} & T4_{\text{critical}}
+\end{bmatrix}
+$$
+
+The system matrix $\mathbf{M}$ is created by subtracting the gradient values from their corresponding thresholds:
+
+$$
+\mathbf{M} = \mathbf{G} - \mathbf{T}
+$$
+
+This difference matrix $\mathbf{M}$ represents how far each gradient is from the **Normal**, **Warning**, and **Critical** thresholds.
+
+#### **Matrix Example**
+
+For each gradient and its corresponding thresholds, the matrix $\mathbf{M}$ is calculated as follows:
+
+* **1-Minute Gradient (G1)**: $G1 = 0.7$, Thresholds: Normal $= 0.5$, Warning $= 1.0$, Critical $= 1.5$
+* **1-Hour Gradient (G2)**: $G2 = 0.4$, Thresholds: Normal $= 0.2$, Warning $= 0.5$, Critical $= 1.0$
+* **1-Day Gradient (G3)**: $G3 = 0.15$, Thresholds: Normal $= 0.1$, Warning $= 0.2$, Critical $= 0.5$
+* **1-Week Gradient (G4)**: $G4 = 0.05$, Thresholds: Normal $= 0.05$, Warning $= 0.1$, Critical $= 0.2$
+
+#### **Difference Matrix Calculation**
+
+The difference matrix $\mathbf{M}$ can be represented as:
+
+$$
+\mathbf{M} = \begin{bmatrix}
+    0.7 - 0.5 & 0.7 - 1.0 & 0.7 - 1.5 \\
+    0.4 - 0.2 & 0.4 - 0.5 & 0.4 - 1.0 \\
+    0.15 - 0.1 & 0.15 - 0.2 & 0.15 - 0.5 \\
+    0.05 - 0.05 & 0.05 - 0.1 & 0.05 - 0.2
+\end{bmatrix}
+$$
+
+This simplifies to:
+
+$$
+\mathbf{M} = \begin{bmatrix}
+    0.2 & -0.3 & -0.8 \\
+    0.2 & -0.1 & -0.6 \\
+    0.05 & -0.05 & -0.35 \\
+    0.00 & -0.05 & -0.15
+\end{bmatrix}
+$$
+
+#### **Determinant Calculation**
+
+To evaluate the overall system state, calculate the **determinant** of the matrix $\mathbf{M}$. In this case, we calculate the determinant of a **2x2 submatrix** from the first two rows:
+
+$$
+\mathbf{M}_{\text{2x2}} = \begin{bmatrix} 0.2 & -0.3 \\ 0.2 & -0.1 \end{bmatrix}
+$$
+
+The determinant is calculated as:
+
+$$
+\text{det}(\mathbf{M}_{\text{2x2}}) = (0.2)(-0.1) - (0.2)(-0.3) = -0.02 + 0.06 = 0.04
+$$
+
+#### **Interpreting the Determinant**
+
+* **Stable System**: If $-1 \leq \text{det}(\mathbf{M}) \leq 1$, the system is considered **stable**.
+* **Unstable System**: If $1 < \text{det}(\mathbf{M}) \leq 5$, the system is considered **unstable**.
+* **Critical Alarm**: If $\text{det}(\mathbf{M}) > 5$ or $\text{det}(\mathbf{M}) < -5$, the system is in **critical alarm mode**.
+
+In this case, the determinant is **0.04**, which falls within the **stable range**.
+
+---
+
+### **3. Combined System: Alarm State and System State**
+
+The **combined system** works as follows:
+
+1. **Alarm State**: Calculate the gradients, compare with thresholds, and determine whether the system is in **Normal**, **Warning**, or **Critical** state.
+2. **System Stability**: In parallel, calculate the difference matrix $\mathbf{M}$ and its determinant to define the system’s **stability** (Stable, Unstable, Critical Alarm).
+
+---
+
+### **Final System Overview**
+
+1. **Calculate Gradients** for each time scale (1 minute, 1 hour, 1 day, and 1 week).
+2. **Determine Alarm State** based on gradient comparisons with the thresholds (Normal, Warning, Critical).
+3. **Calculate the Difference Matrix** $\mathbf{M} = \mathbf{G} - \mathbf{T}$.
+4. **Compute the Determinant** of the matrix $\mathbf{M}$.
+5. **Define the System State** (Stable, Unstable, Critical) based on the determinant value.
+6. **Final Decision**:
+
+   * If the **alarm state** is **Critical**, trigger an alarm.
+   * If the **system state** determinant exceeds the critical range, take immediate corrective action.
+
+---
+
+### **Conclusion**
+
+By combining **gradient-based monitoring** with **linear algebraic analysis**, we create a robust system for temperature monitoring that provides both immediate alerts (via gradients) and long-term stability insights (via determinant calculations). This dual-layer approach allows for comprehensive monitoring of **medium-voltage switchgear** systems, ensuring proactive maintenance and system health management.
+
+---
+
+I hope this summary clarifies the combined approach and how it works mathematically. Let me know if you'd like further details!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### **Conclusion**
 
 The **Multi-Gradient Method** provides a thorough and layered approach to temperature monitoring across multiple time intervals, ensuring you can detect both **immediate fluctuations** and **long-term trends** in temperature. This method helps in identifying potential issues early on and allows for effective corrective actions to maintain system integrity.
