@@ -1,0 +1,53 @@
+| **Category**                         | **Failure Mode**                                                                | **Effect on Algorithm**                                                                                                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. CT & IR Sensor Faults**         | **CT open-circuit** (broken secondary winding)                                  | “Load current” reads zero → ΔT warning suppressed, could mask a real overheat when current is actually flowing.                                                       |
+|                                      | **CT saturation** (too high current)                                            | Distorted current reading → logic may think load just changed and suppress warnings or warnings become erratic.                                                       |
+|                                      | **IR sensor dirty / mis-aimed / wrong emissivity**                              | ΔT reading low or high → false negatives (missed alarm) or false positives (nuisance alarm).                                                                          |
+|                                      | **IR sensor cable intermittent / broken**                                       | ΔT goes “stuck” or drops to zero → possibly no alarm when needed, or “stuck” alarms.                                                                                  |
+|                                      | **IR sensor out of spec (ΔT >300 °C)**                                          | Over-range → sensor may saturate at max value or return error → algorithm may interpret as alarm or ignore it depending on error-handling.                            |
+|                                      | **CT & IR calibration drift**                                                   | Gradual inaccuracy → setpoints no longer valid, leading to under- or over-sensitive alarms.                                                                           |
+| **2. Humidity / Temp Sensor Faults** | **No humidity reading** (probe failed, humidity = NaN)\*\*                      | Dew point can’t be calculated → if code isn’t protected, divide-by-zero or NaN spreads → branch may always “take no action” or crash the controller.                  |
+|                                      | **No temperature reading**                                                      | Dew point invalid → same as above.                                                                                                                                    |
+|                                      | **Humidity stuck at 0 % or 100 %**                                              | Dew point pegged at ambient or extreme → could drive the algorithm into constant “within 5 °C” condition → constant warnings/alarms or complete suppression.          |
+|                                      | **Sensor out of operating range** (e.g. >75 °C, condensing environment)         | Sensor may shut off or freeze → no data or garbage data.                                                                                                              |
+|                                      | **Long-term drift >0.25 %/year**                                                | Humidity error → dew-point misestimation → wrong decisions.                                                                                                           |
+| **3. Calculation & Software Bugs**   | **Dew-point formula edge cases**                                                | At extreme humidity/temperature, the standard formula may overflow or produce crazy values → wrong branch taken.                                                      |
+|                                      | **Uninitialized variables**                                                     | If code forgets to reset ΔT or dew point, old readings linger → erratic behavior.                                                                                     |
+|                                      | **Threshold misconfiguration**                                                  | Setpoints loaded incorrectly (units mix-up °C vs °F, decimal point error) → all logic inverted or disabled.                                                           |
+|                                      | **Time sync / sampling mismatch**                                               | If temperature, humidity and current samples are not time-aligned, the ΔT check <-> current-change check may be nonsensical, leading to false suppressions or alarms. |
+|                                      | **Overflow / underflow**                                                        | In rare high-speed sampling, integer math may overflow → negative ΔT or huge numbers that break the comparisons.                                                      |
+| **4. Communication & Power**         | **RJ45 cable cut or base unit power loss**                                      | ENV-THUM sensor goes silent → missing data → falls into “no action” or code exception depending on error handling.                                                    |
+|                                      | **Modbus / SCADA link glitch**                                                  | IR sensor ΔT not updated → stale data → missed alarms or false alarms.                                                                                                |
+|                                      | **Power flicker to sensors**                                                    | Brief outages → spikes or zeros in readings → spurious warnings/alarms.                                                                                               |
+|                                      | **Controller crash / watchdog reset**                                           | Entire logic stops → no alarms at all until reboot.                                                                                                                   |
+| **5. Actuator & HMI Failures**       | **Relay for heaters stuck open/closed**                                         | Even if algorithm says “turn heater on,” nothing happens → condensation risk persists. Or heaters stuck on → overheating.                                             |
+|                                      | **HMI display offline or frozen**                                               | Warnings/alarms aren’t shown to operators → they remain unaware.                                                                                                      |
+|                                      | **Text-message gateway down**                                                   | Critical alarms never reach mobile staff.                                                                                                                             |
+| **6. Environmental Extremes**        | **Rapid ambient swings** (e.g., door opens, cold air blast)                     | Dew-point threshold hops in and out of “within 5 °C” → chattering alarms.                                                                                             |
+|                                      | **Condensation on sensor**                                                      | Humidity/IR measurement distorted → algorithm misfires.                                                                                                               |
+|                                      | **Electromagnetic interference (EMI)**                                          | CT or digital signals get noisy → ghost readings.                                                                                                                     |
+| **7. Mechanical & Installation**     | **Sensor mis-positioned** (IR pointing at a hot spot, humidity probe near vent) | Data no longer representative of the equipment → false sense of safety or nuisance alarms.                                                                            |
+|                                      | **Sensor enclosure leak** (humidity probe gets wet)                             | Sensor reading invalid → either no action or constant fault alarms.                                                                                                   |
+| **8. Human & Process**               | **Operator overrides alarms**                                                   | He ignores or resets without addressing root cause → equipment damage.                                                                                                |
+|                                      | **No maintenance schedule**                                                     | Dead sensors linger until someone notices.                                                                                                                            |
+| **9. Edge Cases & Missing Logic**    | **Load-change detection window too small/large**                                | Legit load swings (e.g., motor starts) may suppress real thermal alarms or vice versa.                                                                                |
+|                                      | **Dew-point window (5 °C) poorly chosen**                                       | In certain climates, 5 °C might be too narrow or too wide—leads to constant chatter or no warnings at all.                                                            |
+|                                      | **Simultaneous faults**                                                         | E.g., CT failure *and* humidity link down → you get neither branch working → invisible failure of both protections.                                                   |
+
+
+
+
+
+
+
+======================================================================================================================================================================
+
+
+
+
+
+
+
+
+
+
